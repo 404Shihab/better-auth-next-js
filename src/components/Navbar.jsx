@@ -1,18 +1,26 @@
 'use client';
+import { useSession, signOut } from "@/lib/auth-client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const links = [
   { label: "Home", href: "/" },
-  { label: "Features", href: "#features" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "About", href: "#about" },
+  { label: "Features", href: "/features" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "About", href: "/about" },
 ];
 
 const Navbar = () => {
+  const { data, isPending } = useSession();
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+
+  if (isPending) {
+    return <div className="h-16" />;
+  }
+
+  const user = data?.user;
 
   const linkClass = (href) =>
     `rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-default/40 ${
@@ -37,18 +45,35 @@ const Navbar = () => {
         </ul>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Link
-            href="/signin"
-            className="rounded-lg px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-default/40"
-          >
-            Sign In
-          </Link>
-          <Link
-            href="/signup"
-            className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
-          >
-            Sign Up
-          </Link>
+          {user ? (
+            <>
+              <p className="px-2 text-sm font-medium text-foreground">
+                Welcome, {user.name}!
+              </p>
+              <button
+                type="button"
+                onClick={() => signOut()}
+                className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/auth/signin"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-default/40"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/auth/signup"
+                className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
 
         <button
@@ -91,21 +116,41 @@ const Navbar = () => {
               </li>
             ))}
           </ul>
-          <div className="mt-3 flex gap-2">
-            <Link
-              href="/auth/signin"
-              onClick={() => setOpen(false)}
-              className="flex-1 rounded-lg border border-separator px-4 py-2 text-center text-sm font-medium text-foreground transition-colors hover:bg-default/40"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/auth/signup"
-              onClick={() => setOpen(false)}
-              className="flex-1 rounded-lg bg-accent px-4 py-2 text-center text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
-            >
-              Sign Up
-            </Link>
+          <div className="mt-3 flex flex-col gap-2">
+            {user ? (
+              <>
+                <p className="px-1 text-sm font-medium text-foreground">
+                  Welcome, {user.name}!
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false);
+                    signOut();
+                  }}
+                  className="rounded-lg bg-accent px-4 py-2 text-center text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <div className="flex gap-2">
+                <Link
+                  href="/auth/signin"
+                  onClick={() => setOpen(false)}
+                  className="flex-1 rounded-lg border border-separator px-4 py-2 text-center text-sm font-medium text-foreground transition-colors hover:bg-default/40"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/auth/signup"
+                  onClick={() => setOpen(false)}
+                  className="flex-1 rounded-lg bg-accent px-4 py-2 text-center text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}
