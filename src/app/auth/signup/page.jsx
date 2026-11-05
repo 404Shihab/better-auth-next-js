@@ -3,6 +3,7 @@ import { authClient } from "@/lib/auth-client";
 import { Check } from "@gravity-ui/icons";
 import { Button, Description, FieldError, Form, Input, Label, TextField } from "@heroui/react";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 const SignUpPage = () => {
   const onSubmit = async (e) => {
@@ -96,6 +97,12 @@ const SignUpPage = () => {
           </Button>
         </div>
       </Form>
+      <p className="text-sm">
+  Already have an account?{" "}
+  <Link href="/auth/signin" className="font-medium text-blue-600 hover:underline">
+    Sign In
+  </Link>
+</p>
     </div>
   );
 };
